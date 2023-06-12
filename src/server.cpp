@@ -7,13 +7,13 @@ const int kNetworkDelay = 1000;
 
 const char* SERVER_IP = "54.183.146.244";
 
-void readESP(int light_val)
+void readESP(int light_val, int state)
 {
     int err = 0;
     WiFiClient c;
     HttpClient http(c);
 
-    String get_string = String("/?var=") + String(light_val); 
+    String get_string = String("/?var=") + String(light_val) + String("&state=" + String(state)); 
     //err = http.get(kHostname, kPath);
     char final_str[get_string.length() + 1];
     strcpy(final_str, get_string.c_str());

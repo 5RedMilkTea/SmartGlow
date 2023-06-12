@@ -8,14 +8,14 @@
 #define LED_PIN 2
 #define LIGHT_INPUT 33  // Don't have the photoresistor
 #define PWM_CHANNEL 0
-
+#define BUTTON 26
 
 const int pwm_freq = 5000;
 const int resolution = 8;
 
 // State 0 for TOUCH
 // State 1 for Auto-brightness
-int state = 1;  
+int state = 0;  
 
 //I2C Connection
 Adafruit_CAP1188 cap = Adafruit_CAP1188();
@@ -26,6 +26,7 @@ TFT_eSPI tft = TFT_eSPI();
 // Number of touch sensors touched
 int light_level = 0;
 int last_duty = 0;
+
 
 void setup() {
   // Set Baudrate
@@ -43,8 +44,9 @@ void setup() {
   // Connect LED Pin to the PWM Channel
   ledcAttachPin(LED_PIN, PWM_CHANNEL);
   
-  // Set PHOTORESISTOR pin to input
-  //pinMode(LIGHT_INPUT, INPUT);
+  // Attach interrupt
+  pinMode(BUTTON, INPUT);
+  //attachInterrupt(BUTTON, ISR, FALLING);
   
   delay(500);
   // Error check 
@@ -59,6 +61,7 @@ void setup() {
 
 void loop() 
 {
+  
   tft.setTextColor(0x07FF);
   tft.setTextSize(20);
   tft.setCursor(50, 50);
@@ -67,12 +70,11 @@ void loop()
   if (current_duty != 0 && current_duty != last_duty)
   {
     last_duty = current_duty;
-    
   }
   
   light_level = 0;
   
-  // Touch valu
+  // Touch value
   if (state == 0)
   {
     // Serial.printf("last_duty: %d, current_duty: %d\n", last_duty, current_duty);
@@ -101,7 +103,17 @@ void loop()
   //Serial.printf("light level (number of sensors touched): %d\n", light_level);
   //delay(100);
   tft.fillScreen(0xF81F);
-  readESP(last_duty/31);
+  
 
+if (digitalRead(BUTTON))
+{
+  Serial.println("Button Pressed");
+  if (state == 1)
+    state = 0;
+  else
+    state = 1;
+  Serial.println("State: " + String(state));
+}
+readESP(last_duty/31, state);
 }
 

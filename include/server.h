@@ -3,6 +3,6 @@
 #include <HttpClient.h>
 #include <WiFi.h>
 
-void readESP(int light_val);
+void readESP(int light_val, int state);
 
 #endif
